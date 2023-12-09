@@ -1,5 +1,6 @@
 package com.filmland.assestment.entity;
 
+import com.filmland.assestment.dto.SubscriptionDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,14 +22,24 @@ public class Subscription {
     private long id;
 
     private int remainingContent;
+
     private LocalDate subscriptionDate;
+
     private LocalDate paymentDate;
 
-    // TODO: 08-12-2023 Relations
-//    private Customer customer;
-//    private Category category;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
+
+
 //    @ManyToOne
 //    @JoinColumn(name = "subscriber_id")
 //    private Subscriber subscriber;
+
+
 
 }

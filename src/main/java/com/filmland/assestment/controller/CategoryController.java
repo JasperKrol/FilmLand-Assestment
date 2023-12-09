@@ -1,10 +1,12 @@
 package com.filmland.assestment.controller;
 
 import com.filmland.assestment.dto.CategoryResponseDto;
-import com.filmland.assestment.service.CategoryService;
+import com.filmland.assestment.facade.SessionFacade;
+import com.sun.istack.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,16 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CategoryController {
 
-    private final CategoryService categoryService;
+    private final SessionFacade sessionFacade;
 
-    @GetMapping
-    public ResponseEntity<CategoryResponseDto> getCategories() {
+    @GetMapping("/{username}")
+    public ResponseEntity<CategoryResponseDto> getCategories(@PathVariable @NotNull String username) {
 
-        // TODO: 08-12-2023 username to param and get all categories, except subscribed
-        // TODO: 08-12-2023 also get the subscribed ones from user
-
-        CategoryResponseDto availableCategoryService = categoryService.getAllCategories();
-
+        CategoryResponseDto availableCategoryService = sessionFacade.getAllCategories(username);
         return ResponseEntity.ok(availableCategoryService);
+
+
     }
 }

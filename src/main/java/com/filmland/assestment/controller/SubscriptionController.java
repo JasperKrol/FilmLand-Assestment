@@ -1,7 +1,8 @@
 package com.filmland.assestment.controller;
 
 import com.filmland.assestment.dto.ShareSubscriptionDto;
-import com.filmland.assestment.dto.SubscriptionDto;
+import com.filmland.assestment.dto.SubscriptionInputDto;
+import com.filmland.assestment.facade.SessionFacade;
 import com.filmland.assestment.util.DefaultResponseMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SubscriptionController {
 
+    private final SessionFacade sessionFacade;
+
     @PostMapping("/subscribe")
-    public ResponseEntity<DefaultResponseMessage> subscribeToCategory(@RequestBody SubscriptionDto subscriptionDto) {
+    public ResponseEntity<DefaultResponseMessage> subscribeToCategory(@RequestBody SubscriptionInputDto subscriptionInputDto) {
+
+        sessionFacade.subscribeToCategory(subscriptionInputDto);
 
         DefaultResponseMessage defaultResponseMessage = DefaultResponseMessage.create("Login successful", "enjoy watching");
 

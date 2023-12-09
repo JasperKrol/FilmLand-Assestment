@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Setter
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 @Table(name = "customers")
-public class Customer {
+public class Customer implements Subscriber {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,5 +31,22 @@ public class Customer {
     private double credit;
 
     private LocalDate registrationDate;
+
+    private LocalDate freeTrailPeriod;
+
+    private boolean subscriber;
+
+    @OneToMany(mappedBy = "customer")
+    private List<Subscription> subscriptions;
+
+    @Override
+    public boolean isSubscriber() {
+
+        if (!subscriptions.isEmpty()) {
+            this.subscriber = true;
+        }
+
+        return subscriber;
+    }
 
 }
