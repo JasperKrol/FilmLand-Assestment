@@ -12,7 +12,6 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "shared_subscriptions")
 public class SharedSubscription extends Subscription{
 
     @Id

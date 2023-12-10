@@ -14,7 +14,6 @@ public class RenewalScheduler {
 
     private final RenewalService renewalService;
 
-
     @Value("${filmland.auto.renewal:true}")
     private boolean cronJobToggle;
 

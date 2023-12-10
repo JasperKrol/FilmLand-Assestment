@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.filmland.assestment.util.AppDefaultConstants.DEFAULT_FAILURE_STATUS;
+import static com.filmland.assestment.util.AppDefaultConstants.DEFAULT_SUCCES_STATUS;
+
 @RestController()
 @RequestMapping("/api/subscription")
 @RequiredArgsConstructor
@@ -20,21 +23,35 @@ public class SubscriptionController {
 
     @PostMapping("/subscribe")
     public ResponseEntity<DefaultResponseMessage> subscribeToCategory(@RequestBody SubscriptionInputDto subscriptionInputDto) {
+        DefaultResponseMessage message;
 
-        sessionFacade.subscribeToCategory(subscriptionInputDto);
+        try {
+            sessionFacade.subscribeToCategory(subscriptionInputDto);
 
-        DefaultResponseMessage defaultResponseMessage = DefaultResponseMessage.create("Login successful", "enjoy watching");
+            message = DefaultResponseMessage.create(DEFAULT_SUCCES_STATUS, "Subscription successful. Enjoy watching!");
 
-        return ResponseEntity.ok(defaultResponseMessage);
+            return ResponseEntity.ok(message);
+        } catch (Exception e) {
+
+            message = DefaultResponseMessage.create(DEFAULT_FAILURE_STATUS, "Subscription failed. Please try again.");
+
+            return ResponseEntity.badRequest().body(message);
+        }
     }
 
     @PostMapping("/shareSubscription")
     public ResponseEntity<DefaultResponseMessage> shareCategory(@RequestBody ShareSubscriptionDto shareSubscriptionDto) {
+        try {
+            sessionFacade.shareSubscription(shareSubscriptionDto);
 
-        sessionFacade.shareSubscription(shareSubscriptionDto);
+            DefaultResponseMessage message = DefaultResponseMessage.create("success", "Subscription shared successfully. Enjoy watching!");
 
-        DefaultResponseMessage defaultResponseMessage = DefaultResponseMessage.create("Login successful", "enjoy watching");
+            return ResponseEntity.ok(message);
+        } catch (Exception e) {
 
-        return ResponseEntity.ok(defaultResponseMessage);
+            DefaultResponseMessage message = DefaultResponseMessage.create("failure", "Failed to share subscription. Please try again.");
+
+            return ResponseEntity.badRequest().body(message);
+        }
     }
 }

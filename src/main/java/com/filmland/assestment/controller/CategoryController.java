@@ -21,8 +21,8 @@ public class CategoryController {
     public ResponseEntity<CategoryResponseDto> getCategories(@PathVariable @NotNull String username) {
 
         CategoryResponseDto availableCategoryService = sessionFacade.getAllCategories(username);
-        return ResponseEntity.ok(availableCategoryService);
 
+        return ResponseEntity.ok(availableCategoryService);
 
     }
 }
