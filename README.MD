@@ -53,12 +53,13 @@ http://localhost:8080/api/subscription/shareSubscription
 
 Body
 
-`{
+`````
+{
 "email": "info@filmland-assessment.nl",
 "customer": "client@filmland-assessment.nl",
 "subscribedCategory": "International Movies"
 }
-`
+`````
 
 POST
 
@@ -66,8 +67,9 @@ login
 http://localhost:8080/api/login
 
 Body
-`
+````
 {
 "email": "info@filmland-assessment.nl",
 "password": "Javaiscool90"
-}`
+}
+````
