@@ -34,17 +34,23 @@ public class CustomerService {
             customer.setCredit(newCredit);
 
             customerRepository.save(customer);
-
         }
-
-    }
-
-    private boolean freeTrailPeriod(Customer customer) {
-        return customer.getFreeTrailPeriod().isAfter(LOCAL_DATE_OF_NOW);
     }
 
     public List<Customer> getAllSubscribedCustomers() {
 
         return customerRepository.findBySubscriber(true);
+
+    }
+
+    public void creditCustomer(Customer customer, double totalSubscriptionPrice) {
+
+        customer.setCredit(customer.getCredit() - totalSubscriptionPrice);
+
+        customerRepository.save(customer);
+    }
+
+    private boolean freeTrailPeriod(Customer customer) {
+        return customer.getFreeTrailPeriod().isAfter(LOCAL_DATE_OF_NOW);
     }
 }

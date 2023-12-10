@@ -19,6 +19,9 @@ public class SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
 
+    public Subscription getSubscription(long subId) {
+        return subscriptionRepository.findById(subId).orElseThrow(()->new RuntimeException("id not found"));
+    }
 
     public List<SubscriptionDto> getSubscriptions(Customer customer) {
 
@@ -34,9 +37,9 @@ public class SubscriptionService {
                 collect(Collectors.toList());
     }
 
-    public Subscription createSubscription(Customer customer, Category category) {
+    public void createSubscription(Customer customer, Category category) {
 
-        int defaultRemainingContent = checkTypeToCalculate(category.getName());
+        int defaultRemainingContent = checkTypeToCalculateRemainingContent(category.getName());
 
         Subscription addSubscription = new Subscription();
         addSubscription.setRemainingContent(defaultRemainingContent);
@@ -45,10 +48,8 @@ public class SubscriptionService {
         addSubscription.setCategory(category);
         addSubscription.setCustomer(customer);
 
-
         subscriptionRepository.save(addSubscription);
 
-        return addSubscription;
     }
 
     public void renewSubscription(Subscription subscription) {
@@ -63,9 +64,10 @@ public class SubscriptionService {
     public void removeSubscriptions(List<Subscription> subscriptions) {
 
         subscriptionRepository.deleteInBatch(subscriptions);
+
     }
 
-    private int checkTypeToCalculate(String requestedCategory) {
+    private int checkTypeToCalculateRemainingContent(String requestedCategory) {
 
         int defaultValue;
 
@@ -95,5 +97,6 @@ public class SubscriptionService {
                 throw new IllegalArgumentException("Unknown category: " + category);
         }
     }
+
 }
 

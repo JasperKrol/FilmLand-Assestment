@@ -7,6 +7,6 @@ public class ShareSubscriptionDto {
 
     private String email;
     private String customer;
-    private String availableCategory;
+    private String subscribedCategory;
 
 }

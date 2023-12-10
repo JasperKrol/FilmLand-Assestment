@@ -36,8 +36,10 @@ public class Customer implements Subscriber {
 
     private boolean subscriber;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "customer")
     private List<Subscription> subscriptions;
+
+    @OneToMany(mappedBy = "sharingCustomer", fetch = FetchType.LAZY, orphanRemoval = true)
 
     @Override
     public boolean isSubscriber() {
@@ -48,5 +50,4 @@ public class Customer implements Subscriber {
 
         return subscriber;
     }
-
 }

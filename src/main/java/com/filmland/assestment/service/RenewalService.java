@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -16,32 +17,45 @@ public class RenewalService {
     private final CustomerService customerService;
     private final SubscriptionService subscriptionService;
 
+    @Transactional
     public void renewSubscribers() {
 
-        List<Customer> allSubscribedCustomers = customerService.getAllSubscribedCustomers();
+        try {
+            List<Customer> allSubscribedCustomers = customerService.getAllSubscribedCustomers();
 
-        for (Customer customer : allSubscribedCustomers) {
-            List<Subscription> subscriptions = customer.getSubscriptions();
+            for (Customer customer : allSubscribedCustomers) {
+                renewCustomerSubscriptions(customer);
+            }
+        } catch (Exception e) {
+            log.error("Error occurred during subscription renewal: {}", e.getMessage(), e);
+        }
 
-            double totalSubscriptionPrice = subscriptions.stream().mapToDouble(subscription -> subscription.getCategory().getPrice()).sum();
+    }
 
-            if (customer.getCredit() >= totalSubscriptionPrice) {
+    private void renewCustomerSubscriptions(Customer customer) {
+        List<Subscription> subscriptions = customer.getSubscriptions();
 
-                for (Subscription subscription : subscriptions) {
+        double totalSubscriptionPrice = subscriptions.stream().mapToDouble(subscription -> subscription.getCategory().getPrice()).sum();
 
-                    if (customer.getCredit() >= subscription.getCategory().getPrice()) {
+        if (customer.getCredit() >= totalSubscriptionPrice) {
+            renewValidSubscriptions(customer, subscriptions, totalSubscriptionPrice);
+        } else {
+            handleInsufficientCredit(customer, subscriptions);
+        }
+    }
 
-                        subscriptionService.renewSubscription(subscription);
-                        log.info("Renewed subscription for user {}, with subscription {}", customer.getEmail(), subscription.getCategory());
-
-                    }
-                }
-            } else {
-
-//                subscriptionService.removeSubscriptions(subscriptions);
-                log.info("Not enough credit to renew,");
-
+    private void renewValidSubscriptions(Customer customer, List<Subscription> subscriptions, double totalSubscriptionPrice) {
+        for (Subscription subscription : subscriptions) {
+            if (customer.getCredit() >= subscription.getCategory().getPrice()) {
+                subscriptionService.renewSubscription(subscription);
+                customerService.creditCustomer(customer, subscription.getCategory().getPrice());
+                log.info("Renewed subscription for user {}, with subscription {}", customer.getEmail(), subscription.getCategory().getName());
             }
         }
+    }
+
+    private void handleInsufficientCredit(Customer customer, List<Subscription> subscriptions) {
+        subscriptionService.removeSubscriptions(subscriptions);
+        log.info("Not enough credit to renew subscriptions for user {}", customer.getEmail());
     }
 }

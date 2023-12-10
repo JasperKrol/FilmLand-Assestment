@@ -8,24 +8,20 @@ import com.filmland.assestment.repository.CustomerRepository;
 import com.filmland.assestment.repository.SubscriptionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDate;
-import java.time.Month;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static com.filmland.assestment.util.AppDefaultConstants.*;
 
 @AllArgsConstructor
-@Component
+@Configuration
 public class DefaultFilmlandLoader implements CommandLineRunner {
 
     private final CategoryRepository categoryRepository;
     private final CustomerRepository customerRepository;
     private final SubscriptionRepository subscriptionRepository;
-//    private final PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -43,8 +39,8 @@ public class DefaultFilmlandLoader implements CommandLineRunner {
         customerOne.setUsername("info@filmland-assessment.nl");
         customerOne.setEmail("info@filmland-assessment.nl");
         customerOne.setSubscriber(true);
-//        customerOne.setPassword(passwordEncoder.encode("password"));
-        customerOne.setPassword("password");
+//        customerOne.setPassword(passwordEncoder.encode("Javaiscool90"));
+        customerOne.setPassword("Javaiscool90");
         customerOne.setCredit(20);
         customerOne.setRegistrationDate(LocalDate.now());
         customerOne.setFreeTrailPeriod(LocalDate.now().plusMonths(1));
@@ -54,7 +50,6 @@ public class DefaultFilmlandLoader implements CommandLineRunner {
         customerTwo.setUsername("client@filmland-assessment.nl");
         customerTwo.setEmail("client@filmland-assessment.nl");
         customerOne.setSubscriber(true);
-//        customerTwo.setPassword(passwordEncoder.encode("password"));
         customerTwo.setPassword("password");
         customerTwo.setCredit(20);
         customerTwo.setRegistrationDate(LocalDate.now());

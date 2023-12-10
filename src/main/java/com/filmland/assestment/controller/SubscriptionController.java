@@ -25,16 +25,16 @@ public class SubscriptionController {
 
         DefaultResponseMessage defaultResponseMessage = DefaultResponseMessage.create("Login successful", "enjoy watching");
 
-        // TODO: 08-12-2023 message and body 
         return ResponseEntity.ok(defaultResponseMessage);
     }
 
     @PostMapping("/shareSubscription")
     public ResponseEntity<DefaultResponseMessage> shareCategory(@RequestBody ShareSubscriptionDto shareSubscriptionDto) {
 
+        sessionFacade.shareSubscription(shareSubscriptionDto);
+
         DefaultResponseMessage defaultResponseMessage = DefaultResponseMessage.create("Login successful", "enjoy watching");
 
-        // TODO: 08-12-2023 message and body
         return ResponseEntity.ok(defaultResponseMessage);
     }
 }

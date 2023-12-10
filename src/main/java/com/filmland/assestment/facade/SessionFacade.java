@@ -1,18 +1,17 @@
 package com.filmland.assestment.facade;
 
-import com.filmland.assestment.dto.CategoryDto;
-import com.filmland.assestment.dto.CategoryResponseDto;
-import com.filmland.assestment.dto.SubscriptionDto;
-import com.filmland.assestment.dto.SubscriptionInputDto;
+import com.filmland.assestment.dto.*;
 import com.filmland.assestment.entity.Category;
 import com.filmland.assestment.entity.Customer;
 import com.filmland.assestment.entity.Subscription;
 import com.filmland.assestment.service.CategoryService;
 import com.filmland.assestment.service.CustomerService;
+import com.filmland.assestment.service.SharedSubscriptionService;
 import com.filmland.assestment.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,6 +25,7 @@ public class SessionFacade {
     private final CategoryService categoryService;
     private final SubscriptionService subscriptionService;
     private final CustomerService customerService;
+    private final SharedSubscriptionService sharedSubscriptionService;
 
 
     public CategoryResponseDto getAllCategories(String username) {
@@ -42,50 +42,91 @@ public class SessionFacade {
         response.setAvailableCategories(filtered);
         response.setSubscribedCategories(subscriptionList);
 
-
         return response;
     }
-
 
     public void subscribeToCategory(SubscriptionInputDto subscriptionInputDto) {
 
         Customer customer = getCustomer(subscriptionInputDto.getEmail());
         String requestedCategory = subscriptionInputDto.getAvailableCategory();
-        List<Subscription> subscriptions = customer.getSubscriptions();
+
+        if (isSubscribedToCategory(customer, requestedCategory)) {
+            throw new RuntimeException("already subscribed to");
+        }
+
+        Category category = categoryService.getCategory(requestedCategory).orElseThrow(() -> new RuntimeException("type not found"));
+
+        boolean userHasSufficientCredit = validatesCredit(customer, category);
+
+        if (userHasSufficientCredit) {
+
+            subscriptionService.createSubscription(customer, category);
+
+            customerService.updateCustomerAfterSubscription(customer, category);
+
+        } else {
+            throw new RuntimeException("not enough credit to subscribe");
+        }
+    }
+
+    @Transactional
+    public void shareSubscription(ShareSubscriptionDto shareSubscriptionDto) {
+
+        Customer sharingCustomer = customerService.findCustomer(shareSubscriptionDto.getEmail());
+        Customer customerWhoReceivesSubscription = customerService.findCustomer(shareSubscriptionDto.getCustomer());
+        String categoryName = shareSubscriptionDto.getSubscribedCategory();
+
+        List<Subscription> subscriptions = sharingCustomer.getSubscriptions();
+        long subId = getSubId(subscriptions, categoryName);
+        Subscription subscription = subscriptionService.getSubscription(subId);
 
 
-        for (Subscription subscription : subscriptions) {
-            if (subscription.getCategory().getName().equals(requestedCategory)) {
-                throw new RuntimeException("already subscribed to");
+        Category category = categoryService.getCategory(categoryName).orElseThrow(() -> new RuntimeException("Category not found"));
+        double sharedCosts = category.getPrice() / 2;
+
+        boolean sharingUserIsSubscribed = isSubscribedToCategory(sharingCustomer, categoryName);
+        boolean receivingUserIsSubscribed = isSubscribedToCategory(customerWhoReceivesSubscription, categoryName);
+
+        boolean sharingUserHasSufficientCredit = validatesCredit(customerWhoReceivesSubscription, category);
+        boolean receivingUserHasSufficientCredit = validatesCredit(customerWhoReceivesSubscription, category);
+
+        if ((sharingUserIsSubscribed && sharingUserHasSufficientCredit)
+                &&
+                (receivingUserHasSufficientCredit && !receivingUserIsSubscribed)) {
+
+            customerService.creditCustomer(sharingCustomer, sharedCosts);
+            customerService.creditCustomer(customerWhoReceivesSubscription, sharedCosts);
+            sharedSubscriptionService.shareSubscription(sharingCustomer, customerWhoReceivesSubscription, subscription);
+
+
+        }
+    }
+
+    private long getSubId(List<Subscription> subscriptions, String categoryName) {
+        long subId = 0; // Initialize subId before the loop
+
+        for (Subscription sub : subscriptions) {
+            if (sub.getCategory().getName().equals(categoryName)) {
+                subId = sub.getId();
+                break;
             }
         }
 
-        Category category = categoryService.getCategory(requestedCategory).orElseThrow(()-> new RuntimeException("type not found"));
-        
-        boolean userHasSufficientCredit = validatesCredit(customer, category);
+        return subId;
+    }
 
-        if (userHasSufficientCredit){
-
-            Subscription subscription = subscriptionService.createSubscription(customer, category);
-
-            customerService.updateCustomerAfterSubscription(customer,category);
-        }
-        
-
-
-
+    private static boolean isSubscribedToCategory(Customer sharingCustomer, String category) {
+        return sharingCustomer.getSubscriptions().stream().anyMatch(subscription -> subscription.getCategory().getName().equals(category));
     }
 
     private boolean validatesCredit(Customer customer, Category category) {
         return customer.getCredit() >= category.getPrice();
     }
 
-
     private List<CategoryDto> filterAvailableCategories(List<CategoryDto> availableCategories, List<SubscriptionDto> subscriptionList) {
 
         List<CategoryDto> filteredResults = new ArrayList<>(availableCategories);
 
-//      Iterator, hence you cannot remove item while looping over
         Iterator<CategoryDto> iterator = filteredResults.iterator();
 
         while (iterator.hasNext()) {
@@ -94,13 +135,11 @@ public class SessionFacade {
             for (SubscriptionDto subscription : subscriptionList) {
 
                 if (availableCategory.getName().equals(subscription.getName())) {
-
                     iterator.remove();
                     break;
                 }
             }
         }
-
         return filteredResults;
     }
 
@@ -109,4 +148,3 @@ public class SessionFacade {
     }
 
 }
-

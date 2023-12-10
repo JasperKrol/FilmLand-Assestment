@@ -3,6 +3,7 @@ package com.filmland.assestment.job;
 import com.filmland.assestment.service.RenewalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -13,11 +14,16 @@ public class RenewalScheduler {
 
     private final RenewalService renewalService;
 
-    @Scheduled()
+
+    @Value("${filmland.auto.renewal:true}")
+    private boolean cronJobToggle;
+
+    @Scheduled(cron = "${filmland.auto.renewal.cronExpression}")
     public void renewSubscriptions() {
-        log.info("Scheduled job for subscriptions starting");
 
-        renewalService.renewSubscribers();
-
+        if (cronJobToggle) {
+            log.info("Scheduled job for subscriptions starting");
+            renewalService.renewSubscribers();
+        }
     }
 }
