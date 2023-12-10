@@ -14,6 +14,15 @@
 ### 3. Run the application
 ### 4. Access the Application
 Open your web browser and go to http://localhost:8080.
+
+* H2 console  http://localhost:8080/h2-console 
+
+````
+JDBC URL = jdbc:h2:mem:filmland
+username = admin
+password = password
+````
+
 ### 5. Login
 Use the following credentials to log in:
 
