@@ -35,6 +35,11 @@ public class CustomerService {
 
             customerRepository.save(customer);
         }
+
+        if (!customer.isSubscriber()){
+            customer.setSubscriber(true);
+            customerRepository.save(customer);
+        }
     }
 
     public List<Customer> getAllSubscribedCustomers() {

@@ -71,8 +71,3 @@ Body
 "email": "info@filmland-assessment.nl",
 "password": "Javaiscool90"
 }`
-
-
-### 1. Clone the Repository
-### 1. Clone the Repository
-### 1. Clone the Repository

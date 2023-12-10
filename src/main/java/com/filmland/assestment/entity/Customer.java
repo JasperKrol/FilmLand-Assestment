@@ -47,7 +47,6 @@ public class Customer implements Subscriber {
         if (!subscriptions.isEmpty()) {
             this.subscriber = true;
         }
-
         return subscriber;
     }
 }

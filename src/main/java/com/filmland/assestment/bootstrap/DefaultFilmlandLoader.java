@@ -25,7 +25,6 @@ public class DefaultFilmlandLoader implements CommandLineRunner {
 
 //    private final PasswordEncoder passwordEncoder;
 
-
     @Override
     public void run(String... args) throws Exception {
 
@@ -40,7 +39,6 @@ public class DefaultFilmlandLoader implements CommandLineRunner {
         customerOne.setId(1);
         customerOne.setUsername("info@filmland-assessment.nl");
         customerOne.setEmail("info@filmland-assessment.nl");
-        customerOne.setSubscriber(true);
 //        customerOne.setPassword(passwordEncoder.encode("Javaiscool90"));
         customerOne.setPassword("Javaiscool90");
         customerOne.setCredit(20);
@@ -51,7 +49,7 @@ public class DefaultFilmlandLoader implements CommandLineRunner {
         customerTwo.setId(2);
         customerTwo.setUsername("client@filmland-assessment.nl");
         customerTwo.setEmail("client@filmland-assessment.nl");
-        customerTwo.setSubscriber(true);
+        customerTwo.setSubscriber(false);
 //        customerTwo.setPassword(passwordEncoder.encode("Javaiscool90"));
         customerTwo.setPassword("password");
         customerTwo.setCredit(20);
