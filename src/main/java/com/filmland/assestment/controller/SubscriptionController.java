@@ -33,7 +33,7 @@ public class SubscriptionController {
             return ResponseEntity.ok(message);
         } catch (Exception e) {
 
-            message = DefaultResponseMessage.create(DEFAULT_FAILURE_STATUS, "Subscription failed. Please try again.");
+            message = DefaultResponseMessage.create(DEFAULT_FAILURE_STATUS, e.getMessage());
 
             return ResponseEntity.badRequest().body(message);
         }
@@ -49,7 +49,7 @@ public class SubscriptionController {
             return ResponseEntity.ok(message);
         } catch (Exception e) {
 
-            DefaultResponseMessage message = DefaultResponseMessage.create("failure", "Failed to share subscription. Please try again.");
+            DefaultResponseMessage message = DefaultResponseMessage.create("failure", e.getMessage());
 
             return ResponseEntity.badRequest().body(message);
         }

@@ -86,19 +86,23 @@ public class SessionFacade {
 
         boolean sharingUserIsSubscribed = isSubscribedToCategory(sharingCustomer, categoryName);
         boolean receivingUserIsSubscribed = isSubscribedToCategory(customerWhoReceivesSubscription, categoryName);
+        boolean sharedSubscriptionExists = sharedSubscriptionService.haveSharedSubscription(sharingCustomer, customerWhoReceivesSubscription);
 
         boolean sharingUserHasSufficientCredit = validatesCredit(customerWhoReceivesSubscription, category);
         boolean receivingUserHasSufficientCredit = validatesCredit(customerWhoReceivesSubscription, category);
 
-        if ((sharingUserIsSubscribed && sharingUserHasSufficientCredit)
-                &&
-                (receivingUserHasSufficientCredit && !receivingUserIsSubscribed)) {
+        if (sharingUserIsSubscribed && sharingUserHasSufficientCredit
+                && receivingUserHasSufficientCredit && !receivingUserIsSubscribed
+                && !sharedSubscriptionExists) {
 
-            customerService.creditCustomer(sharingCustomer, sharedCosts);
-            customerService.creditCustomer(customerWhoReceivesSubscription, sharedCosts);
-            sharedSubscriptionService.shareSubscription(sharingCustomer, customerWhoReceivesSubscription, subscription);
+                customerService.creditCustomer(sharingCustomer, sharedCosts);
+                customerService.creditCustomer(customerWhoReceivesSubscription, sharedCosts);
+                sharedSubscriptionService.shareSubscription(sharingCustomer, customerWhoReceivesSubscription, subscription);
 
 
+
+        } else {
+            throw new RuntimeException("Could not share");
         }
     }
 
@@ -115,8 +119,8 @@ public class SessionFacade {
         return subId;
     }
 
-    private static boolean isSubscribedToCategory(Customer sharingCustomer, String category) {
-        return sharingCustomer.getSubscriptions().stream().anyMatch(subscription -> subscription.getCategory().getName().equals(category));
+    private static boolean isSubscribedToCategory(Customer customer, String category) {
+        return customer.getSubscriptions().stream().anyMatch(subscription -> subscription.getCategory().getName().equals(category));
     }
 
     private boolean validatesCredit(Customer customer, Category category) {

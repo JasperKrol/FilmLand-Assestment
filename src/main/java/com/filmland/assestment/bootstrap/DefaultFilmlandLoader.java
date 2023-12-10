@@ -23,8 +23,6 @@ public class DefaultFilmlandLoader implements CommandLineRunner {
     private final CustomerRepository customerRepository;
     private final SubscriptionRepository subscriptionRepository;
 
-//    private final PasswordEncoder passwordEncoder;
-
     @Override
     public void run(String... args) throws Exception {
 

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class SharedSubscriptionService {
 
-    private final SharedSubscriptionRepository subscriptionRepository;
+    private final SharedSubscriptionRepository sharedSubscriptionRepository;
 
     public void shareSubscription(Customer sharingCustomer, Customer customerWhoReceivesSubscription, Subscription subscription) {
 
@@ -25,7 +25,12 @@ public class SharedSubscriptionService {
         sharedSubscription.setSharingCustomer(sharingCustomer);
         sharedSubscription.setReceivingCustomer(customerWhoReceivesSubscription);
 
-        subscriptionRepository.save(sharedSubscription);
+        sharedSubscriptionRepository.save(sharedSubscription);
         log.info("Subscription shared with {} and {}, category: {}", sharingCustomer.getEmail(),customerWhoReceivesSubscription.getEmail(), subscription.getCategory().getName());
+    }
+
+    public boolean haveSharedSubscription(Customer customer1, Customer customer2) {
+        return sharedSubscriptionRepository.existsBySharingCustomerAndReceivingCustomer(customer1, customer2)
+                || sharedSubscriptionRepository.existsBySharingCustomerAndReceivingCustomer(customer2, customer1);
     }
 }
